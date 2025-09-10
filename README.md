@@ -1,154 +1,51 @@
-# Project Setup Guide
+# 🩺🤖 MediBot: AI Doctor with RAG, Vision, and Voice
+This project is a sophisticated AI-powered medical consultation application built with Python and the Gradio framework. It acts as an AI "doctor" that can answer patient queries using a combination of voice, text, and image input. The application is powered by a Retrieval-Augmented Generation (RAG) system for grounded medical knowledge, multimodal large language models for image analysis, and voice-to-text and text-to-voice capabilities for a seamless conversational experience.
 
-This guide provides step-by-step instructions to set up your project environment, including the installation of FFmpeg and PortAudio across macOS, Linux, and Windows, as well as setting up a Python virtual environment using Pipenv, pip, or conda.
+### ✨ Features
+Multimodal Input: Patients can describe their symptoms using voice or text, and can also upload images (e.g., a photo of a rash or a medical report).
 
-## Table of Contents
+Voice Interaction: Integrates with an audio-to-text model for transcribing the patient's query and a text-to-speech model for generating an audible response from the AI doctor.
 
-1. [Installing FFmpeg and PortAudio](#installing-ffmpeg-and-portaudio)
-   - [macOS](#macos)
-   - [Linux](#linux)
-   - [Windows](#windows)
-2. [Setting Up a Python Virtual Environment](#setting-up-a-python-virtual-environment)
-   - [Using Pipenv](#using-pipenv)
-   - [Using pip and venv](#using-pip-and-venv)
-   - [Using Conda](#using-conda)
-3. [Running the application](#project-phases-and-python-commands)
+Retrieval-Augmented Generation (RAG): Uses a pre-built knowledge base (from a medical PDF) to provide accurate and grounded medical advice, reducing the risk of hallucinations.
 
-## Installing FFmpeg and PortAudio
+Emergency Alert System: The AI is programmed to identify and flag potential medical emergencies within its responses, prompting the user to seek immediate care.
 
-### macOS
+Session History: Allows for follow-up questions and provides the option to download the full consultation history as a text file.
 
-1. **Install Homebrew** (if not already installed):
+Chatbot Evaluation: Includes a separate script to evaluate the AI's performance using metrics like ROUGE, BLEU, and BERTScore.
 
-   ```bash
-   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-   ```
+### 📁 File Structure
+build_rag_database_from_pdf.py: This is the initial setup script. It takes a medical knowledge PDF file, processes it, creates text embeddings, and saves them to a FAISS index and a pickle file. This index forms the core of the RAG system.
 
-2. **Install FFmpeg and PortAudio:**
+brain_of_the_doctor.py: The core logic for the AI doctor. It handles interactions with the Groq API, processes the user's query along with any image input and the retrieved medical context, and generates the final text response.
 
-   ```bash
-   brew install ffmpeg portaudio
-   ```
+voice_of_the_patient.py: Manages the patient's voice input. It uses the speech_recognition library to record audio from the microphone and the Groq Whisper model to transcribe it into text.
 
+voice_of_the_doctor.py: Responsible for the AI doctor's voice output. It uses gTTS (Google Text-to-Speech) to convert the text response into an audio file, which is then played back to the user.
 
-### Linux
-For Debian-based distributions (e.g., Ubuntu):
+gradio_app.py: The main application file. It orchestrates the entire process, creating the user interface with Gradio and linking the other modules to handle the consultation flow.
 
-1. **Update the package list**
+chatbot_evaluation.py: A utility script for evaluating the chatbot's performance. It reads a CSV of simulated responses and calculates various NLP metrics to assess the quality of the AI's answers.
 
-```
-sudo apt update
-```
+### Install dependencies:
+This project requires several libraries. You can install them using pip:
 
-2. **Install FFmpeg and PortAudio:**
-```
-sudo apt install ffmpeg portaudio19-dev
-```
-
-### Windows
-
-#### Download FFmpeg:
-1. Visit the official FFmpeg download page: [FFmpeg Downloads](https://ffmpeg.org/download.html)
-2. Navigate to the Windows builds section and download the latest static build.
-
-#### Extract and Set Up FFmpeg:
-1. Extract the downloaded ZIP file to a folder (e.g., `C:\ffmpeg`).
-2. Add the `bin` directory to your system's PATH:
-   - Search for "Environment Variables" in the Start menu.
-   - Click on "Edit the system environment variables."
-   - In the System Properties window, click on "Environment Variables."
-   - Under "System variables," select the "Path" variable and click "Edit."
-   - Click "New" and add the path to the `bin` directory (e.g., `C:\ffmpeg\bin`).
-   - Click "OK" to apply the changes.
-
-#### Install PortAudio:
-1. Download the PortAudio binaries from the official website: [PortAudio Downloads](http://www.portaudio.com/download.html)
-2. Follow the installation instructions provided on the website.
-
----
-
-## Setting Up a Python Virtual Environment
-
-### Using Pipenv
-1. **Install Pipenv (if not already installed):**  
-```
-pip install pipenv
-```
-
-2. **Install Dependencies with Pipenv:** 
-
-```
-pipenv install
-```
-
-3. **Activate the Virtual Environment:** 
-
-```
-pipenv shell
-```
-
----
-
-### Using `pip` and `venv`
-#### Create a Virtual Environment:
-```
-python -m venv venv
-```
-
-#### Activate the Virtual Environment:
-**macOS/Linux:**
-```
-source venv/bin/activate
-```
-
-**Windows:**
-```
-venv\Scripts\activate
-```
-
-#### Install Dependencies:
-```
 pip install -r requirements.txt
-```
 
----
+Set up API Keys:
+Create a .env file in the project's root directory and add your API keys:
 
-### Using Conda
-#### Create a Conda Environment:
-```
-conda create --name myenv python=3.11
-```
+GROQ_API_KEY="your_groq_api_key_here"
+ELEVENLABS_API_KEY="your_elevenlabs_api_key_here"
 
-#### Activate the Conda Environment:
-```
-conda activate myenv
-```
+Prepare the RAG Database:
+Place your medical knowledge PDF (e.g., The_GALE_ENCYCLOPEDIA_of_MEDICINE_SECOND.pdf) in the specified data path within the build_rag_database_from_pdf.py file. Then run the script to build the RAG index:
 
-#### Install Dependencies:
-```
-pip install -r requirements.txt
-```
+python build_rag_database_from_pdf.py
 
+### 🚀 Running the Application
+Once the setup is complete, you can launch the application:
 
-# Project Phases and Python Commands
-
-## Phase 1: Brain of the doctor
-```
-python brain_of_the_doctor.py
-```
-
-## Phase 2: Voice of the patient
-```
-python voice_of_the_patient.py
-```
-
-## Phase 3: Voice of the doctor
-```
-python voice_of_the_doctor.py
-```
-
-## Phase 4: Setup Gradio UI
-```
 python gradio_app.py
-```
 
+This will start a local Gradio server, and a link to the web interface will appear in your console. Open this link in your browser to begin your consultation.
